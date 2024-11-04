@@ -1,39 +1,36 @@
 package com.kroissant.ai_chatbot;
 
-import com.intellij.ui.components.JBScrollBar;
-import com.intellij.ui.components.JBScrollPane;
-
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
-import java.lang.reflect.InvocationTargetException;
 
+import com.intellij.ui.components.JBScrollPane;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 
 public class MessageSection extends JPanel{
-    private final JPanel messageContainer;
-    private final JScrollPane scrollPane;
+    private final JPanel messagePanel;
+    private final JBScrollPane scrollPane;
     private final Parser parser;
     private final HtmlRenderer renderer;
+
 
     public MessageSection() {
         // Initialize Markdown parser and renderer
         parser = Parser.builder().build();
         renderer = HtmlRenderer.builder().build();
 
-        // Set the layout for the main panel
+        // Set the layout of this panel
         setLayout(new BorderLayout());
 
-        // Create a container for messages
-        messageContainer = new JPanel();
-        messageContainer.setLayout(new BoxLayout(messageContainer, BoxLayout.Y_AXIS));
+        // Create a panel to store the messages
+        messagePanel = new JPanel();
+        messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.Y_AXIS));
 
-        // Create a scroll pane to hold the message container
-        scrollPane = new JScrollPane(messageContainer);
+        // Create a scroll pane to hold the messagePanel
+        scrollPane = new JBScrollPane(messagePanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-        // Add the scroll pane to the main panel
+        // Add the scroll pane to this panel
         add(scrollPane, BorderLayout.CENTER);
     }
 
@@ -41,30 +38,26 @@ public class MessageSection extends JPanel{
         // Convert Markdown to HTML
         String html = convertMarkdownToHtml(message);
 
-        // Create a JEditorPane to display the HTML message
+        // Create a EditorPane that can display HTML
         JEditorPane messageEditorPane = new JEditorPane("text/html", html);
         messageEditorPane.setEditable(false);
-        messageEditorPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // Add some padding
 
         // Align the message based on the sender
-        JPanel messagePanel = new JPanel();
-        messagePanel.setLayout(new BorderLayout());
-        messagePanel.add(messageEditorPane, sender.equalsIgnoreCase("AI") ? BorderLayout.WEST : BorderLayout.EAST);
-        messageContainer.add(messagePanel);
+        JPanel messageContainer = new JPanel();
+        messageContainer.setLayout(new BorderLayout());
+        messageContainer.add(messageEditorPane, sender.equals("AI") ? BorderLayout.WEST : BorderLayout.EAST);
 
-        messageContainer.revalidate();
-        messageContainer.repaint();
+        // Add the new message to the GUI
+        messagePanel.add(messageContainer);
+
+        // Repaint the panel
+        messagePanel.revalidate();
+        messagePanel.repaint();
         scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
     }
 
     private String convertMarkdownToHtml(String markdown) {
-        // Parse and render Markdown to HTML
+        // Convert Markdown into HTML
         return renderer.render(parser.parse(markdown));
-    }
-
-    public void clearMessages() {
-        messageContainer.removeAll();
-        messageContainer.revalidate();
-        messageContainer.repaint();
     }
 }

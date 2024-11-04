@@ -6,7 +6,7 @@
   <vendor>David Neacsu</vendor>
 
   <description>
-    This is a plugin that implements a simple chatbot into IntelliJ using ollama.
+    This is a plugin that implements a simple chatbot into IntelliJ using a local LLM with ollama.
   </description>
 
   <!-- Product and plugin compatibility requirements.
@@ -26,7 +26,5 @@
             id="com.kroissant.ai_chatbot.settings.AppSettingsConfig"
             displayName="AI Chatbot Config"/>
   </extensions>
-  <actions>
-    <action id="HelloWorld" class="com.kroissant.ai_chatbot.HelloWorld" text="Hello World"/>
-  </actions>
+
 </idea-plugin>

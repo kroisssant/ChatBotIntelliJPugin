@@ -37,6 +37,7 @@ public class ChatBot {
         chatResult = ollamaAPI.chat(builder.withMessages(history).withMessage(OllamaChatMessageRole.USER, promt)
                 .build());
         history = chatResult.getChatHistory();
+        System.out.println(history);
         return chatResult;
     }
 }
