@@ -1,0 +1,32 @@
+<idea-plugin>
+  <id>com.kroissant.AI_chatbot</id>
+
+  <name>AI_chatbot</name>
+
+  <vendor>David Neacsu</vendor>
+
+  <description>
+    This is a plugin that implements a simple chatbot into IntelliJ using ollama.
+  </description>
+
+  <!-- Product and plugin compatibility requirements.
+       Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+  <depends>com.intellij.modules.platform</depends>
+
+  <!-- Extension points defined by the plugin.
+       Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+  <extensions defaultExtensionNs="com.intellij">
+    <toolWindow id="AI chatbot"
+                factoryClass="com.kroissant.ai_chatbot.AiWindow"/>  <!-- Optional: Path to your icon -->
+    anchor="right">
+    <applicationService serviceImplementation="com.kroissant.ai_chatbot.settings.AppSettings"/>
+    <applicationConfigurable
+            parentId="tools"
+            instance="com.kroissant.ai_chatbot.settings.AppSettingsConfig"
+            id="com.kroissant.ai_chatbot.settings.AppSettingsConfig"
+            displayName="AI Chatbot Config"/>
+  </extensions>
+  <actions>
+    <action id="HelloWorld" class="com.kroissant.ai_chatbot.HelloWorld" text="Hello World"/>
+  </actions>
+</idea-plugin>
