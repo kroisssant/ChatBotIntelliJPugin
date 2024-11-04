@@ -1,5 +1,7 @@
 package com.kroissant.ai_chatbot;
 
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
@@ -13,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.image.ImageObserver;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -38,11 +41,11 @@ public class AiWindow implements ToolWindowFactory {
         JBTextField input = new JBTextField();
         JButton sendMessage = new JButton("SEND");
         JPanel inputPanel = new JPanel();
-        JBScrollPane messagePanel = messageSection.getScrollableMessagePane();
+        JPanel messagePanel = messageSection;
         private AIChatBot(ToolWindow toolWindow) {
             window = toolWindow;
             setUpButton();
-            panel.setLayout(new BorderLayout());
+            panel.setLayout(new BorderLayout(10, 10));
             System.out.println(panel.getHeight());
             panel.add(messagePanel,BorderLayout.NORTH);
             inputPanel = createSendMessagePanel(toolWindow);
@@ -54,7 +57,13 @@ public class AiWindow implements ToolWindowFactory {
         private void setUpButton() {
             sendMessage.addActionListener(e -> {
                 updateMessagePanel();
-
+            });
+            input.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "enterAction");
+            input.getActionMap().put("enterAction", new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    updateMessagePanel();
+                }
             });
         }
         private JPanel createSendMessagePanel (ToolWindow toolWindow) {
@@ -76,20 +85,20 @@ public class AiWindow implements ToolWindowFactory {
             return sendMessagePanel;
         }
         private void updateMessagePanel() {
-            try {
-                messageSection.addUserMessage(input.getText());
-                OllamaResult response = chat.chat(input.getText());
-                messageSection.addAIMessage(response.getResponse());
-            } catch (OllamaBaseException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            System.out.println(window.getContentManager().getComponent().getHeight());
-            System.out.println(messagePanel.getHeight());
-            messagePanel.setPreferredSize(new Dimension(Integer.MAX_VALUE, window.getContentManager().getComponent().getHeight()-inputPanel.getHeight() - 20));
+            Application app = ApplicationManager.getApplication();
+            messageSection.addMessage(input.getText(), "USER");
+            messageSection.setPreferredSize(new Dimension(panel.getWidth(), panel.getHeight() - inputPanel.getHeight()- 10));
+            app.executeOnPooledThread(() -> {
+                OllamaResult response = null;
+                try {
+                    response = chat.chat(input.getText());
+                    messageSection.addMessage(response.getResponse(), "AI");
+
+                } catch (OllamaBaseException | IOException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            messagePanel.setMaximumSize(new Dimension(100, 1000));
             panel.add(messagePanel, BorderLayout.NORTH);
             panel.revalidate();
             panel.repaint();

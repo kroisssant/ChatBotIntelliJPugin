@@ -13,6 +13,7 @@ repositories {
 }
 dependencies {
   implementation("io.github.ollama4j:ollama4j:1.0.79")
+  implementation("org.commonmark:commonmark:0.24.0")
 }
 
 // Configure Gradle IntelliJ Plugin
